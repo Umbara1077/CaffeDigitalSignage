@@ -1,0 +1,55 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #000; /* Set background color to black for better video appearance */
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    align-items: center;
+    justify-content: center;
+}
+
+#video-container {
+    width: 100%;
+    height: 100vh; /* Full height */
+    display: none;
+    background-color: black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#intro-video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Cover the entire container, cropping if necessary */
+}
+
+#home-page {
+    flex: 1;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100vh; /* Full height for menu page */
+}
+
+.menu-grid {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%; /* Full height */
+}
+
+.menu-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Cover the entire container, cropping if necessary */
+}
+
+html, body {
+    overflow: hidden;
+}

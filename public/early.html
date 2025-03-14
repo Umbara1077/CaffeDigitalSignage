@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Too Early</title>
+    <link rel="icon" href="dolce-logo.png" type="image/x-icon">
+    <script src="https://www.gstatic.com/firebasejs/7.24.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.24.0/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.24.0/firebase-storage.js"></script>
+    <script src="hoursConfig.js"></script>
+    <script src="network-status.js"></script>
+    <style>
+         body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: black;
+            color: white;
+            font-family: 'Roboto', sans-serif;
+            text-align: center;
+        }
+        #early-message-container {
+            padding: 20px;
+            background-color: #222; 
+            border-radius: 15px;
+            max-width: 800px;
+            width: 100%;
+            box-shadow: 
+            -15px 0 30px rgba(2, 253, 2, 0.5),  
+            0 0 50px rgba(255, 255, 255, 0.9),  
+            15px 0 30px rgba(250, 25, 25, 0.608);  
+        }
+
+        .logo img {
+            max-width: 200px;
+            margin-bottom: 20px;
+        }
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            color: #f9f7f7;
+        }
+    </style>
+</head>
+<body>
+    <div id="early-message-container">
+        <div class="logo">
+            <img src="dolce-logo.png" alt="Dolce Vita Gelateria Logo">
+        </div>
+        <h1 id="status-message">Sorry we are closed! Caffe' Bar menu will automatically during buisness hours</h1>
+    </div>
+
+     <script>
+    document.addEventListener('DOMContentLoaded', () => {
+    function fetchBusinessHours(callback) {
+        hoursDB.collection("business_hours").doc("hours").get().then((doc) => {
+            if (doc.exists) {
+                const data = doc.data();
+                console.log("📢 Fetched Business Hours for early.html:", data);
+
+                if (!data.openTime || !data.closeTime) {
+                    console.error("❌ Missing openTime or closeTime in Firestore!");
+                    return;
+                }
+
+                // Ensure openTime and closeTime are numbers
+                const openTime = parseInt(data.openTime, 10);
+                const closeTime = parseInt(data.closeTime, 10);
+
+                // Convert HHMM format to hour and minute values
+                const openHour = Math.floor(openTime / 100);
+                const openMinute = openTime % 100;
+                const closeHour = Math.floor(closeTime / 100);
+                const closeMinute = closeTime % 100;
+
+                console.log(`✅ Open Time: ${openHour}:${openMinute}`);
+                console.log(`✅ Close Time: ${closeHour}:${closeMinute}`);
+
+                callback({ openHour, openMinute, closeHour, closeMinute });
+            } else {
+                console.error("❌ Business hours document not found!");
+            }
+        }).catch((error) => console.error("❌ Firestore fetch error:", error));
+    }
+
+    function checkTime(businessHours) {
+        const now = new Date();
+        const day = now.getDay();
+        const hours = now.getHours();
+        const minutes = now.getMinutes();
+        const seconds = now.getSeconds();
+
+        // 🔴 HARDCODED BUSINESS DAYS (WED-SUN)
+        const isBusinessDay = (day === 0 || (day >= 3 && day <= 7));
+
+        const { openHour, openMinute, closeHour, closeMinute } = businessHours;
+
+        // Check if within open hours
+        const isOpenHours = isBusinessDay &&
+                            (hours > openHour || (hours === openHour && minutes >= openMinute)) &&
+                            (hours < closeHour || (hours === closeHour && minutes < closeMinute));
+
+        console.log(`🕒 NOW: ${hours}:${minutes}:${seconds}`);
+        console.log(`📅 Business Days: Open Wed-Sun`);
+        console.log(`✅ Is Today a Business Day? ${isBusinessDay}`);
+        console.log(`✅ Is Open Now? ${isOpenHours}`);
+
+        if (isOpenHours) {
+            console.log("✅ Store is OPEN - Redirecting to index.html");
+            setTimeout(() => { window.location.href = "index.html"; }, 500);
+        } else {
+            document.getElementById('status-message').textContent =
+                "Sorry, we are closed! Caffe' Bar menu will automatically start at " + openHour + ":" + 
+                (openMinute < 10 ? "0" + openMinute : openMinute);
+        }
+    }
+
+    fetchBusinessHours(checkTime);
+    setInterval(() => fetchBusinessHours(checkTime), 60000);
+});
+    </script>    
+
+    <!--
+    <script>
+        function checkTime() {
+            const now = new Date();
+            const day = now.getDay();
+            const hours = now.getHours();
+            const minutes = now.getMinutes();
+            const seconds = now.getSeconds();
+    
+            // Define business days and open hours
+            const isWednesday = (day === 3); // Wednesday only
+            const isThursday = (day === 4); // Thursday only
+            const isFridayToSunday = (day === 0 || (day >= 5 && day <= 6)); // Include Sunday as part of business days
+    
+            // Open hours for each day
+            const isOpenHoursWednesdayThursday = (hours >= 7 && (hours < 20 || (hours === 20 && minutes === 0)));
+            const isOpenHoursFridayToSunday = (hours >= 7 && (hours < 20 || (hours === 20 && minutes === 0)));
+    
+            // Determine if business is open based on the day and hours
+            const isBusinessDay = isWednesday || isThursday || isFridayToSunday;
+            const isOpenHours = ((isWednesday || isThursday) && isOpenHoursWednesdayThursday) || 
+                                (isFridayToSunday && isOpenHoursFridayToSunday);
+    
+            console.log(`Now: ${hours}:${minutes}:${seconds}`);
+            console.log(`Business Day: ${isBusinessDay}`);
+            console.log(`Open Hours: ${isOpenHours}`);
+            console.log(isWednesday ? "Time Zone: Wednesday (7 AM to 8 PM)"
+                                    : isThursday ? "Time Zone: Thursday (7 AM to 8 PM)"
+                                    : isFridayToSunday ? "Time Zone: Friday-Sunday (7 AM to 8 PM)" : "");
+    
+            if (isOpenHours && isBusinessDay) {
+                console.log("Redirecting to index.html from early.html");
+                setTimeout(() => {
+                    window.location.href = "index.html";
+                }, 500); // Small delay to stabilize the redirection
+            } else {
+                document.getElementById('status-message').textContent = "Sorry we are closed! Caffe' Bar menu will automatically start at 7:00 AM";
+            }
+        }
+    
+        checkTime();
+        setInterval(checkTime, 60000); // Check every minute
+    </script> -->
+    
+    </body>
+    </html>    
