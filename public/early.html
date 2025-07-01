@@ -94,8 +94,7 @@
         const minutes = now.getMinutes();
         const seconds = now.getSeconds();
 
-        // 🔴 HARDCODED BUSINESS DAYS (WED-SUN)
-        const isBusinessDay = (day === 0 || (day >= 3 && day <= 7));
+       const isBusinessDay = (day === 0 || (day >= 2 && day <= 6));
 
         const { openHour, openMinute, closeHour, closeMinute } = businessHours;
 
