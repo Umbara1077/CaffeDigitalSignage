@@ -15,3 +15,18 @@ const firebaseConfig = {
   const db = firebase.firestore();
   const myAuth = firebase.auth();
   
+  // After firebase.initializeApp(config)
+firebase.firestore().enablePersistence({
+  synchronizeTabs: true  // Allows multiple tabs to share cache
+})
+.then(() => {
+  console.log("✅ Firebase offline persistence enabled");
+})
+.catch((err) => {
+  console.error("❌ Failed to enable persistence:", err);
+  if (err.code === 'failed-precondition') {
+    console.log("Multiple tabs open, persistence can only be enabled in one tab at a time");
+  } else if (err.code === 'unimplemented') {
+    console.log("Browser doesn't support persistence");
+  }
+});
