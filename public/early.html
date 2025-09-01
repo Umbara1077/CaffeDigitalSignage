@@ -186,7 +186,7 @@
         <h1 id="status-message">Sorry we are closed! Caffe' Bar menu will automatically during buisness hours</h1>
     </div>
 
-     <script>
+    <script>
     document.addEventListener('DOMContentLoaded', () => {
     function fetchBusinessHours(callback) {
         hoursDB.collection("business_hours").doc("hours").get().then((doc) => {
@@ -212,7 +212,12 @@
                 console.log(`✅ Open Time: ${openHour}:${openMinute}`);
                 console.log(`✅ Close Time: ${closeHour}:${closeMinute}`);
 
-                callback({ openHour, openMinute, closeHour, closeMinute });
+                // NEW: read openDays from Firestore (0=Sun … 6=Sat)
+                const openDays = Array.isArray(data.openDays)
+                  ? data.openDays.map(n => parseInt(n, 10))
+                  : [];
+
+                callback({ openHour, openMinute, closeHour, closeMinute, openDays });
             } else {
                 console.error("❌ Business hours document not found!");
             }
@@ -226,7 +231,9 @@
         const minutes = now.getMinutes();
         const seconds = now.getSeconds();
 
-       const isBusinessDay = (day === 0 || (day >= 3 && day <= 7)); // Open on Wed-Sun
+        // const isBusinessDay = (day === 0 || (day >= 3 && day <= 7)); // Open on Wed-Sun
+        // NEW: drive open/closed days from Firestore
+        const isBusinessDay = Array.isArray(businessHours.openDays) && businessHours.openDays.includes(day);
 
         const { openHour, openMinute, closeHour, closeMinute } = businessHours;
 
@@ -236,7 +243,7 @@
                             (hours < closeHour || (hours === closeHour && minutes < closeMinute));
 
         console.log(`🕒 NOW: ${hours}:${minutes}:${seconds}`);
-        console.log(`📅 Business Days: Open Wed-Sun`);
+        console.log(`📅 Business Days:`, businessHours.openDays); // NEW: show from DB
         console.log(`✅ Is Today a Business Day? ${isBusinessDay}`);
         console.log(`✅ Is Open Now? ${isOpenHours}`);
 
@@ -253,7 +260,7 @@
     fetchBusinessHours(checkTime);
     setInterval(() => fetchBusinessHours(checkTime), 60000);
 });
-    </script>    
+</script>
 
     <!--
     <script>
