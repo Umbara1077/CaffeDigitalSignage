@@ -37,217 +37,129 @@
             </div>
         </main>
     </div>
+
+<script>
+  const RD_KEY = 'lastRedirectTs';
+  const RD_COOLDOWN_MS = 12000; // keep your value
+
+  // add "force" param (default false)
+  function guardedReplace(url, force = false) {
+    const last = parseInt(sessionStorage.getItem(RD_KEY) || '0', 10);
+    if (!force && (Date.now() - last < RD_COOLDOWN_MS)) {
+      console.warn('🛑 Redirect suppressed (cooldown).');
+      return;
+    }
+    sessionStorage.setItem(RD_KEY, Date.now().toString());
+    window.location.replace(url);
+  }
+</script>
+
     
-    <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        let retryAttempts = 0;
-        const maxRetries = 3;
-        const cacheExpiryTime = 10 * 60 * 1000; // 10 minutes in milliseconds
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  let retryAttempts = 0;
+  const maxRetries = 3;
 
-        // Simple caching functions
-        function getCachedBusinessHours() {
-            try {
-                const cached = localStorage.getItem('businessHours');
-                const timestamp = localStorage.getItem('businessHoursTimestamp');
-                
-                if (cached && timestamp) {
-                    const age = Date.now() - parseInt(timestamp);
-                    if (age < cacheExpiryTime) {
-                        console.log("📋 Using cached business hours");
-                        return JSON.parse(cached);
-                    } else {
-                        console.log("⏰ Cached business hours expired");
-                        // Clear expired cache
-                        localStorage.removeItem('businessHours');
-                        localStorage.removeItem('businessHoursTimestamp');
-                    }
-                }
-            } catch (error) {
-                console.error("❌ Error reading cache:", error);
-            }
-            return null;
-        }
+  // Fetch business hours directly from Firestore (no cache, no fallback)
+  function fetchBusinessHours(callback) {
+    const attemptFetch = (attempt = 0) => {
+      console.log(`📡 Fetching business hours (attempt ${attempt + 1}/${maxRetries})`);
 
-        function setCachedBusinessHours(businessHours) {
-            try {
-                localStorage.setItem('businessHours', JSON.stringify(businessHours));
-                localStorage.setItem('businessHoursTimestamp', Date.now().toString());
-                console.log("💾 Business hours cached successfully");
-            } catch (error) {
-                console.error("❌ Error setting cache:", error);
-            }
-        }
+      hoursDB.collection("business_hours").doc("hours").get()
+        .then((doc) => {
+          if (!doc.exists) {
+            console.error("❌ No business_hours doc found!");
+            return;
+          }
 
-        function getFallbackBusinessHours() {
-            console.log("🔄 Using fallback business hours");
-            return {
-                openHour: 13,
-                openMinute: 0,
-                closeHour: 21,
-                closeMinute: 30,
-                // NEW: include fallback days (0=Sun … 6=Sat). 
-                openDays: [0,1,3,4,5,6] // open every day except Tuesday
-            };
-        }
+          const data = doc.data() || {};
+          console.log("📢 Firestore raw data:", data);
 
-        function fetchBusinessHours(callback) {
-            const attemptFetch = (attempt = 0) => {
-                console.log(`📡 Attempting to fetch business hours (attempt ${attempt + 1}/${maxRetries})`);
-                
-                hoursDB.collection("business_hours").doc("hours").get()
-                    .then((doc) => {
-                        if (doc.exists) {
-                            const data = doc.data();
-                            console.log("📢 Fetched Business Hours:", data);
+          if (!data.openTime || !data.closeTime) {
+            console.error("❌ Missing openTime or closeTime in Firestore!");
+            return;
+          }
 
-                            if (!data.openTime || !data.closeTime) {
-                                console.error("❌ Missing openTime or closeTime in Firestore!");
-                                // Try cached data or fallback
-                                const cachedHours = getCachedBusinessHours();
-                                if (cachedHours) {
-                                    callback(cachedHours);
-                                } else {
-                                    callback(getFallbackBusinessHours());
-                                }
-                                return;
-                            }
+          const openTime  = parseInt(data.openTime, 10);
+          const closeTime = parseInt(data.closeTime, 10);
 
-                            // Ensure openTime and closeTime are numbers
-                            const openTime = parseInt(data.openTime, 10);
-                            const closeTime = parseInt(data.closeTime, 10);
+          const openHour    = Math.floor(openTime / 100);
+          const openMinute  = openTime % 100;
+          const closeHour   = Math.floor(closeTime / 100);
+          const closeMinute = closeTime % 100;
 
-                            // Convert HHMM format to hour and minute values
-                            const openHour = Math.floor(openTime / 100);
-                            const openMinute = openTime % 100;
-                            const closeHour = Math.floor(closeTime / 100);
-                            const closeMinute = closeTime % 100;
+          // Normalize openDays
+          let openDays = [];
+          if (Array.isArray(data.openDays)) {
+            openDays = data.openDays.map(v => parseInt(v, 10)).filter(n => !isNaN(n));
+          }
+          if (openDays.length === 0) {
+            console.warn("⚠️ openDays missing/empty, defaulting to all days");
+            openDays = [0,1,2,3,4,5,6];
+          }
 
-                            console.log(`✅ Open Time: ${openHour}:${openMinute}`);
-                            console.log(`✅ Close Time: ${closeHour}:${closeMinute}`);
+          const businessHours = { openHour, openMinute, closeHour, closeMinute, openDays };
+          retryAttempts = 0;
+          callback(businessHours);
+        })
+        .catch((error) => {
+          console.error(`❌ Firestore fetch error:`, error);
+          if (attempt < maxRetries - 1) {
+            const delay = Math.pow(2, attempt) * 1000;
+            console.log(`🔄 Retrying in ${delay}ms...`);
+            setTimeout(() => attemptFetch(attempt + 1), delay);
+          }
+        });
+    };
+    attemptFetch();
+  }
 
-                            // NEW: read openDays (0=Sun … 6=Sat)
-                            const openDays = Array.isArray(data.openDays)
-                              ? data.openDays.map(n => parseInt(n, 10))
-                              : [];
+  function checkTime(businessHours) {
+    const now = new Date();
+    const day = now.getDay();
+    const hrs = now.getHours();
+    const mins = now.getMinutes();
 
-                            const businessHours = { openHour, openMinute, closeHour, closeMinute, openDays };
-                            
-                            // Cache the successful result
-                            setCachedBusinessHours(businessHours);
-                            
-                            callback(businessHours);
-                            retryAttempts = 0; // Reset on success
-                        } else {
-                            console.error("❌ Business hours document not found!");
-                            // Try cached data or fallback
-                            const cachedHours = getCachedBusinessHours();
-                            if (cachedHours) {
-                                callback(cachedHours);
-                            } else {
-                                callback(getFallbackBusinessHours());
-                            }
-                        }
-                    })
-                    .catch((error) => {
-                        console.error(`❌ Firestore fetch error (attempt ${attempt + 1}):`, error);
-                        
-                        if (attempt < maxRetries - 1) {
-                            // Retry with exponential backoff
-                            const delay = Math.pow(2, attempt) * 1000; // 1s, 2s, 4s
-                            console.log(`🔄 Retrying in ${delay}ms...`);
-                            setTimeout(() => attemptFetch(attempt + 1), delay);
-                        } else {
-                            console.error("❌ Max retries reached for business hours fetch");
-                            // Try cached data first, then fallback
-                            const cachedHours = getCachedBusinessHours();
-                            if (cachedHours) {
-                                console.log("📋 Using cached business hours after fetch failure");
-                                callback(cachedHours);
-                            } else {
-                                console.log("🔄 Using fallback business hours after fetch failure");
-                                callback(getFallbackBusinessHours());
-                            }
-                        }
-                    });
-            };
-            
-            attemptFetch();
-        }
+    console.log("—— index.html checkTime ——");
+    console.log("🗓 Today’s day index:", day);
+    console.log("⏰ Current time:", `${hrs}:${mins < 10 ? "0"+mins : mins}`);
+    console.log("📅 Allowed openDays:", businessHours.openDays);
 
-        function checkTime(businessHours) {
-            const now = new Date();
-            const day = now.getDay();
-            const hours = now.getHours();
-            const minutes = now.getMinutes();
+    const isBusinessDay = businessHours.openDays.includes(day);
 
-            // NEW: drive business day from DB/cached hours
-            const isBusinessDay = Array.isArray(businessHours.openDays) && businessHours.openDays.includes(day);
+    const { openHour, openMinute, closeHour, closeMinute } = businessHours;
 
-            const { openHour, openMinute, closeHour, closeMinute } = businessHours;
+    const afterOpen   = (hrs > openHour) || (hrs === openHour && mins >= openMinute);
+    const beforeClose = (hrs < closeHour) || (hrs === closeHour && mins < closeMinute);
+    const isOpenHours = isBusinessDay && afterOpen && beforeClose;
 
-            // Check if current time is within open hours
-            const isOpenHours = isBusinessDay &&
-                                (hours > openHour || (hours === openHour && minutes >= openMinute)) &&
-                                (hours < closeHour || (hours === closeHour && minutes < closeMinute));
+    console.log(`🕒 Schedule: ${openHour}:${openMinute} → ${closeHour}:${closeMinute}`);
+    console.log("➡️ afterOpen:", afterOpen, "| beforeClose:", beforeClose);
+    console.log("➡️ isBusinessDay:", isBusinessDay);
+    console.log("➡️ FINAL isOpenHours:", isOpenHours);
 
-            console.log(`🕒 NOW: ${hours}:${minutes} | OPEN: ${openHour}:${openMinute} - ${closeHour}:${closeMinute} | isOpenHours: ${isOpenHours}`);
-            console.log(`✅ Is Today a Business Day? ${isBusinessDay}`);
-            
-            if (!isOpenHours) {
-                console.log("🔴 Store is CLOSED - Redirecting to early.html");
-                setTimeout(() => { window.location.href = "early.html"; }, 500);
-            }
-        }
+    if (!isOpenHours) {
+      console.log("🔴 Decided CLOSED → redirecting to early.html");
+      setTimeout(() => { guardedReplace("early.html", true); }, 500);
+    } else {
+      console.log("🟢 Decided OPEN → staying on index.html");
+    }
+  }
 
-        // Network status monitoring
-        function handleOnline() {
-            console.log("🌐 Network connection restored");
-            retryAttempts = 0; // Reset retry attempts when back online
-        }
+  // Keep network monitoring
+  function handleOnline() { console.log("🌐 Network up"); retryAttempts = 0; }
+  function handleOffline() { console.log("📴 Network down"); }
+  window.addEventListener('online', handleOnline);
+  window.addEventListener('offline', handleOffline);
 
-        function handleOffline() {
-            console.log("📴 Network connection lost - will use cached data");
-        }
+  function setupBusinessHoursCheck() {
+    fetchBusinessHours(checkTime);
+    const intervalId = setInterval(() => fetchBusinessHours(checkTime), 60000);
+    window.addEventListener('beforeunload', () => clearInterval(intervalId));
+  }
 
-        // Add network event listeners
-        window.addEventListener('online', handleOnline);
-        window.addEventListener('offline', handleOffline);
-
-        // Enhanced interval function with better error handling
-        function setupBusinessHoursCheck() {
-            fetchBusinessHours(checkTime);
-            
-            // Set up interval with error boundary
-            const intervalId = setInterval(() => {
-                try {
-                    fetchBusinessHours(checkTime);
-                } catch (error) {
-                    console.error("❌ Error in business hours check interval:", error);
-                    // Continue with cached or fallback data
-                    const cachedHours = getCachedBusinessHours();
-                    if (cachedHours) {
-                        checkTime(cachedHours);
-                    } else {
-                        checkTime(getFallbackBusinessHours());
-                    }
-                }
-            }, 60000);
-
-            // Clean up interval on page unload
-            window.addEventListener('beforeunload', () => {
-                clearInterval(intervalId);
-            });
-        }
-
-        // Initialize with error handling
-        try {
-            setupBusinessHoursCheck();
-        } catch (error) {
-            console.error("❌ Critical error during initialization:", error);
-            // Use fallback hours if everything fails
-            checkTime(getFallbackBusinessHours());
-        }
-    });
+  setupBusinessHoursCheck();
+});
 </script>
 
    <!-- <script>
