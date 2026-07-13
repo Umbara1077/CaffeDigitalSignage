@@ -12,10 +12,13 @@
 
     /* The single master background gradient every page sits on. Everything
        else (columns, sections, tables) stays transparent over this so the
-       whole page reads as one field instead of a patchwork of boxes. */
-    --menu-bg-green: #0d2b12;
-    --menu-bg-black: #050505;
-    --menu-bg-burgundy: #1a0508;
+       whole page reads as one field instead of a patchwork of boxes.
+       Deep black -> charcoal -> a barely-there warm wine hint. No green —
+       this is a dark, premium/cinema palette, not an Italian-flag callback
+       (that lives only in the flag strip accent at the top). */
+    --menu-bg-black: #080808;
+    --menu-bg-charcoal: #141414;
+    --menu-bg-wine: #1a0a0a;
 }
 
 *, *::before, *::after {
@@ -32,10 +35,11 @@ body.menu-page {
     width: 100vw;
     height: 100vh;
     /* One diagonal gradient is the visual foundation for the whole page —
-       forest green top-left, through black, into deep wine at bottom-right.
-       No other element should carry its own competing background; they sit
-       transparent on top of this so the page reads as one unified field. */
-    background: linear-gradient(135deg, var(--menu-bg-green) 0%, var(--menu-bg-black) 50%, var(--menu-bg-burgundy) 100%);
+       deep black through charcoal into a barely-perceptible warm wine hint
+       at the bottom-right corner. No other element should carry its own
+       competing background; they sit transparent on top of this so the
+       page reads as one unified, premium-dark field. */
+    background: linear-gradient(135deg, var(--menu-bg-black) 0%, var(--menu-bg-charcoal) 45%, var(--menu-bg-wine) 100%);
     box-shadow: inset 0 0 16vw rgba(0, 0, 0, 0.5);
     color: var(--menu-white);
     font-family: 'Oswald', Arial, sans-serif;
@@ -103,12 +107,13 @@ body.menu-page {
 
 /* Soft glow behind the center column that enhances the master body gradient
    rather than competing with it — a borderless radial fade with no hard
-   edge or shape, so it never reads as a separate panel/card. */
+   edge or shape, so it never reads as a separate panel/card. Warm gold,
+   not green, to match the palette (no green anywhere in the background). */
 .menu-col.center::before {
     content: "";
     position: absolute;
     inset: -15% -30%;
-    background: radial-gradient(ellipse 60% 55% at 50% 50%, rgba(0, 146, 70, 0.14), transparent 72%);
+    background: radial-gradient(ellipse 60% 55% at 50% 50%, rgba(255, 233, 176, 0.09), transparent 72%);
     z-index: -1;
     pointer-events: none;
 }
@@ -346,7 +351,7 @@ body.menu-page {
        corner into the banner's red, with a tighter red glow as the accent
        right at the seam — so the handoff feels continuous, not abrupt. */
     box-shadow:
-        0 -14px 46px rgba(26, 5, 8, 0.65),
+        0 -14px 46px rgba(26, 10, 10, 0.65),
         0 -6px 22px rgba(210, 31, 60, 0.4);
     display: flex;
     align-items: center;
