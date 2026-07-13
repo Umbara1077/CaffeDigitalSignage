@@ -6,10 +6,16 @@
     --menu-red: #d21f3c;
     --menu-red-deep: #7a0f1f;
     --menu-green: #009246;
-    --menu-green-deep: #04120a;
     --menu-white: #f5f5f0;
     --menu-gold: #e0b84c;
     --menu-gold-light: #ffe9b0;
+
+    /* The single master background gradient every page sits on. Everything
+       else (columns, sections, tables) stays transparent over this so the
+       whole page reads as one field instead of a patchwork of boxes. */
+    --menu-bg-green: #0d2b12;
+    --menu-bg-black: #050505;
+    --menu-bg-burgundy: #1a0508;
 }
 
 *, *::before, *::after {
@@ -25,11 +31,12 @@ body.menu-page {
     padding: 0;
     width: 100vw;
     height: 100vh;
-    background:
-        radial-gradient(ellipse 120% 55% at 50% -8%, rgba(224, 184, 76, 0.16), transparent 60%),
-        radial-gradient(ellipse 110% 50% at 50% 112%, rgba(210, 31, 60, 0.16), transparent 60%),
-        linear-gradient(180deg, #000000 0%, var(--menu-green-deep) 55%, #0d2415 100%);
-    box-shadow: inset 0 0 18vw rgba(0, 0, 0, 0.65);
+    /* One diagonal gradient is the visual foundation for the whole page —
+       forest green top-left, through black, into deep wine at bottom-right.
+       No other element should carry its own competing background; they sit
+       transparent on top of this so the page reads as one unified field. */
+    background: linear-gradient(135deg, var(--menu-bg-green) 0%, var(--menu-bg-black) 50%, var(--menu-bg-burgundy) 100%);
+    box-shadow: inset 0 0 16vw rgba(0, 0, 0, 0.5);
     color: var(--menu-white);
     font-family: 'Oswald', Arial, sans-serif;
     display: flex;
@@ -83,6 +90,7 @@ body.menu-page {
     min-height: 0;
     min-width: 0;
     overflow: hidden;
+    background: transparent;
 }
 
 .menu-col.center {
@@ -93,16 +101,14 @@ body.menu-page {
     overflow: visible;
 }
 
-/* Subtle vertical dark-green gradient glow behind the center column content */
+/* Soft glow behind the center column that enhances the master body gradient
+   rather than competing with it — a borderless radial fade with no hard
+   edge or shape, so it never reads as a separate panel/card. */
 .menu-col.center::before {
     content: "";
     position: absolute;
-    inset: -4% -12%;
-    background: linear-gradient(180deg,
-        rgba(0, 146, 70, 0.16) 0%,
-        rgba(0, 146, 70, 0.03) 45%,
-        rgba(0, 146, 70, 0.16) 100%);
-    border-radius: 18px;
+    inset: -15% -30%;
+    background: radial-gradient(ellipse 60% 55% at 50% 50%, rgba(0, 146, 70, 0.14), transparent 72%);
     z-index: -1;
     pointer-events: none;
 }
@@ -115,6 +121,7 @@ body.menu-page {
     display: flex;
     flex-direction: column;
     min-height: 0;
+    background: transparent;
 }
 
 .menu-section-title {
@@ -156,6 +163,7 @@ body.menu-page {
 .price-table {
     width: 100%;
     border-collapse: collapse;
+    background: transparent;
 }
 
 .price-table th {
@@ -334,7 +342,12 @@ body.menu-page {
     position: relative;
     overflow: hidden;
     background: linear-gradient(90deg, var(--menu-red-deep), var(--menu-red) 35%, #ff4d61 50%, var(--menu-red) 65%, var(--menu-red-deep));
-    box-shadow: 0 -6px 26px rgba(210, 31, 60, 0.45);
+    /* A wider, burgundy-toned shadow bridges the master gradient's dark wine
+       corner into the banner's red, with a tighter red glow as the accent
+       right at the seam — so the handoff feels continuous, not abrupt. */
+    box-shadow:
+        0 -14px 46px rgba(26, 5, 8, 0.65),
+        0 -6px 22px rgba(210, 31, 60, 0.4);
     display: flex;
     align-items: center;
     justify-content: center;
