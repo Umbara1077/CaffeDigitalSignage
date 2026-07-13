@@ -126,3 +126,127 @@ button:hover {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     text-align: center;
 }
+
+.menu-editor-panel {
+    max-width: 900px;
+    align-items: stretch;
+}
+
+.menu-editor-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    justify-content: center;
+}
+
+.menu-editor-toolbar select {
+    width: auto;
+    padding: 8px;
+}
+
+.menu-editor-status {
+    min-height: 1.2em;
+    font-weight: bold;
+    text-align: center;
+}
+
+.menu-editor-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+}
+
+.menu-editor-form {
+    width: 100%;
+    text-align: left;
+}
+
+.menu-editor-topfields {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.menu-field {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.menu-field span {
+    min-width: 110px;
+    text-transform: capitalize;
+    font-size: 0.9em;
+    color: #555;
+}
+
+.menu-field input {
+    flex: 1;
+    padding: 6px 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.menu-editor-section {
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 12px;
+    margin-bottom: 16px;
+}
+
+.menu-editor-section legend {
+    padding: 0 6px;
+    width: auto;
+}
+
+.menu-editor-section legend .menu-field {
+    min-width: 260px;
+}
+
+.menu-editor-subtable {
+    margin-top: 10px;
+    padding-top: 8px;
+    border-top: 1px dashed #ddd;
+}
+
+.menu-editor-item-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin: 6px 0;
+}
+
+.menu-editor-item-row .menu-field span {
+    min-width: 45px;
+}
+
+.menu-editor-item-row input {
+    width: 110px;
+}
+
+.menu-add-btn {
+    margin-top: 6px;
+    background-color: #2e7d32;
+}
+
+.menu-add-btn:hover {
+    background-color: #1b5e20;
+}
+
+.menu-remove-btn {
+    background-color: #b00020;
+    padding: 6px 10px;
+    font-size: 0.85em;
+}
+
+.menu-remove-btn:hover {
+    background-color: #7f0016;
+}
+
+.menu-remove-section {
+    margin-top: 10px;
+}

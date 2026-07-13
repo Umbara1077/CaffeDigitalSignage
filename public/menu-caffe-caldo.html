@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Caffe Caldo - Hot Coffee Menu</title>
+    <link rel="icon" href="dolce-logo.png" type="image/x-icon">
+    <link rel="stylesheet" href="menu-common.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Oswald:wght@400;600&display=swap" rel="stylesheet">
+
+    <script src="https://www.gstatic.com/firebasejs/7.24.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.24.0/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.24.0/firebase-storage.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.24.0/firebase-auth.js"></script>
+    <script src="firebaseConfig.js"></script>
+    <script src="menu-common.js"></script>
+    <script src="menu-seed-data.js"></script>
+</head>
+<body class="menu-page">
+    <div class="italian-flag-strip" aria-hidden="true"></div>
+    <div class="menu-main">
+        <div class="menu-col left">
+            <div class="menu-section" id="section-tradizionale"></div>
+            <div class="menu-section" id="section-conDolcezza"></div>
+        </div>
+
+        <div class="menu-col center">
+            <img src="dolce-logo.png" alt="Dolce Vita Gelato" class="menu-logo">
+            <h1 class="menu-title" id="menu-title">CAFFE CALDO</h1>
+            <div class="menu-subtitle" id="menu-subtitle">HOT COFFEE</div>
+            <div class="menu-quote" id="menu-quote"></div>
+        </div>
+
+        <div class="menu-col right">
+            <div class="menu-section" id="section-gustiCappuccinoLatte"></div>
+            <div class="menu-section" id="section-conGelato"></div>
+        </div>
+    </div>
+
+    <div class="menu-banner">
+        <span class="menu-banner-text" id="banner-text">MOBILE ORDERING</span>
+        <span class="menu-banner-url" id="banner-url"></span>
+        <img src="dolce-logo.png" alt="Dolce Vita Gelato">
+    </div>
+
+    <script>
+        function renderCaffeCaldo(data) {
+            document.getElementById('menu-title').textContent = data.title || 'CAFFE CALDO';
+            document.getElementById('menu-subtitle').textContent = data.subtitle || 'HOT COFFEE';
+            document.getElementById('menu-quote').textContent = data.quote || '';
+            document.getElementById('section-tradizionale').innerHTML = renderSection(sectionById(data, 'tradizionale'));
+            document.getElementById('section-conDolcezza').innerHTML = renderSection(sectionById(data, 'conDolcezza'));
+            document.getElementById('section-gustiCappuccinoLatte').innerHTML = renderSection(sectionById(data, 'gustiCappuccinoLatte'));
+            document.getElementById('section-conGelato').innerHTML = renderSection(sectionById(data, 'conGelato'));
+            document.getElementById('banner-text').textContent = data.bannerText || 'MOBILE ORDERING';
+            document.getElementById('banner-url').textContent = data.bannerUrl || '';
+        }
+
+        // Render immediately from the baked-in seed data so the board is never blank,
+        // even before Firestore is seeded or if the network is unavailable.
+        renderCaffeCaldo(MENU_SEED_DATA.caffe_caldo);
+
+        // Live Firestore data (admin edits) then takes over seamlessly.
+        listenMenu('caffe_caldo', renderCaffeCaldo, () => {
+            console.warn('menus/caffe_caldo not seeded in Firestore yet — showing built-in defaults.');
+        });
+    </script>
+</body>
+</html>

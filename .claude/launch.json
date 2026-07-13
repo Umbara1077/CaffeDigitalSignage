@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "static-preview",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["-m", "http.server", "5501", "--directory", "public"],
+      "port": 5501
+    },
+    {
+      "name": "menu-verify-preview",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["-m", "http.server", "5799", "--directory", "public"],
+      "port": 5799
+    }
+  ]
+}

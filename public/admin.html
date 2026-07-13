@@ -11,6 +11,8 @@
     <script src="https://www.gstatic.com/firebasejs/7.24.0/firebase-auth.js"></script>
     <script src="firebaseConfig.js"></script>
     <script src="admin-script.js"></script>
+    <script src="menu-seed-data.js"></script>
+    <script src="menu-admin.js"></script>
     <link rel="icon" href="dolce-logo.png" type="image/x-icon">
     <style>
         .btn {
@@ -37,7 +39,7 @@
     <script>
         myAuth.onAuthStateChanged(user => {
             const currentPath = window.location.pathname;
-    
+
             if (user && currentPath !== '/admin.html' && !sessionStorage.getItem('redirected')) {
                 sessionStorage.setItem('redirected', 'true');
                 window.location.href = 'admin.html';
@@ -102,9 +104,32 @@
         <section>
             <h2>Current Videos</h2>
             <div class="current-menu-grid" id="currentVideos">
-             
+
             </div>
-        </section>        
+        </section>
+
+        <section class="menu-editor-panel">
+            <h2>Menu Editor</h2>
+            <p>Edit the live Gelato / Caffe Caldo / Caffe Freddo signage menus. Changes save to Firestore and update the TV pages instantly.</p>
+
+            <div class="menu-editor-toolbar">
+                <select id="menuEditorSelect">
+                    <option value="">Select a menu...</option>
+                </select>
+                <button type="button" id="menuEditorReloadButton">Reload</button>
+                <button type="button" id="menuEditorSaveButton">Save Changes</button>
+                <button type="button" id="menuSeedButton">Seed Menu Data</button>
+            </div>
+            <p id="menuEditorStatus" class="menu-editor-status"></p>
+
+            <div class="menu-editor-links">
+                <a href="menu-gelato.html" target="_blank" class="btn">View Gelato Menu</a>
+                <a href="menu-caffe-caldo.html" target="_blank" class="btn">View Caffe Caldo Menu</a>
+                <a href="menu-caffe-freddo.html" target="_blank" class="btn">View Caffe Freddo Menu</a>
+            </div>
+
+            <div id="menuEditorForm" class="menu-editor-form"></div>
+        </section>
 
         <section>
             <button id="viewMainPageButton">View Main Page</button>

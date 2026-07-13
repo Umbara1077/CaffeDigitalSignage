@@ -1,0 +1,332 @@
+/* Shared styles for Firestore-backed TV signage menu pages
+   (menu-gelato.html, menu-caffe-caldo.html, menu-caffe-freddo.html) */
+
+:root {
+    --menu-black: #000;
+    --menu-red: #d21f3c;
+    --menu-red-deep: #7a0f1f;
+    --menu-green: #009246;
+    --menu-white: #f5f5f0;
+    --menu-gold: #e0b84c;
+    --menu-gold-light: #ffe9b0;
+}
+
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+html, body {
+    overflow: hidden;
+}
+
+body.menu-page {
+    margin: 0;
+    padding: 0;
+    width: 100vw;
+    height: 100vh;
+    background:
+        radial-gradient(ellipse 120% 55% at 50% -8%, rgba(224, 184, 76, 0.10), transparent 60%),
+        radial-gradient(ellipse 110% 50% at 50% 112%, rgba(210, 31, 60, 0.10), transparent 60%),
+        var(--menu-black);
+    box-shadow: inset 0 0 18vw rgba(0, 0, 0, 0.65);
+    color: var(--menu-white);
+    font-family: 'Oswald', Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Animated Italian tricolor strip across the very top of the board */
+.italian-flag-strip {
+    flex-shrink: 0;
+    width: 100%;
+    height: clamp(5px, 0.6vh, 10px);
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(90deg,
+        var(--menu-green) 0 33.33%,
+        var(--menu-white) 33.33% 66.66%,
+        var(--menu-red) 66.66% 100%);
+}
+
+.italian-flag-strip::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -40%;
+    width: 40%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.9), transparent);
+    filter: blur(1px);
+    animation: flagSweep 4.5s linear infinite;
+}
+
+@keyframes flagSweep {
+    0% { left: -40%; }
+    100% { left: 100%; }
+}
+
+.menu-main {
+    flex: 1 1 auto;
+    display: grid;
+    grid-template-columns: 30fr 38fr 32fr;
+    gap: clamp(14px, 2.2vw, 42px);
+    padding: clamp(10px, 1.8vh, 28px) clamp(20px, 2.6vw, 56px);
+    min-height: 0;
+    overflow: hidden;
+}
+
+.menu-col {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(8px, 1.6vh, 22px);
+    min-height: 0;
+    min-width: 0;
+    overflow: hidden;
+}
+
+.menu-col.center {
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    overflow: visible;
+}
+
+.menu-col.left { --col-delay: 0s; }
+.menu-col.center { --col-delay: 0.15s; }
+.menu-col.right { --col-delay: 0.3s; }
+
+.menu-section {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
+.menu-section-title {
+    font-family: 'Anton', 'Arial Narrow', 'Impact', sans-serif;
+    font-weight: 400;
+    font-style: italic;
+    line-height: 1.3;
+    letter-spacing: 1.5px;
+    font-size: clamp(20px, 2.3vw, 38px);
+    color: var(--menu-gold-light);
+    text-shadow: 0 0 12px rgba(224, 184, 76, 0.5), 0 0 26px rgba(210, 31, 60, 0.25);
+    border-bottom: 3px solid transparent;
+    border-image: linear-gradient(90deg, var(--menu-green), var(--menu-gold), var(--menu-red)) 1;
+    padding-bottom: 4px;
+    margin: 0 0 5px;
+    text-transform: uppercase;
+}
+
+.price-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.price-table th {
+    font-size: clamp(11px, 1.15vw, 17px);
+    text-transform: uppercase;
+    color: var(--menu-gold);
+    text-shadow: 0 0 6px rgba(224, 184, 76, 0.4);
+    font-weight: 600;
+    text-align: right;
+    padding-bottom: 4px;
+    letter-spacing: 1.5px;
+}
+
+.price-table th:first-child {
+    text-align: left;
+}
+
+.price-table td {
+    font-size: clamp(15px, 1.6vw, 25px);
+    padding: 4px 2px;
+    border-bottom: 1px solid rgba(255, 255, 255, .14);
+}
+
+.price-table td.name {
+    text-align: left;
+}
+
+.price-table td.price {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    font-weight: 700;
+    min-width: 66px;
+    color: var(--menu-gold);
+    text-shadow: 0 0 10px rgba(224, 184, 76, 0.35);
+}
+
+.matrix-table td.name {
+    font-weight: 600;
+}
+
+.menu-note {
+    font-style: italic;
+    font-size: clamp(12px, 1.05vw, 16px);
+    color: var(--menu-gold);
+    margin-top: 7px;
+}
+
+.menu-logo {
+    width: clamp(100px, 12vw, 190px);
+    height: auto;
+    filter: drop-shadow(0 6px 18px rgba(0, 0, 0, 0.6));
+}
+
+.menu-title {
+    font-family: 'Anton', 'Arial Narrow', 'Impact', sans-serif;
+    font-weight: 400;
+    font-style: italic;
+    font-size: clamp(40px, 6.6vw, 112px);
+    line-height: 1.3;
+    margin: clamp(6px, 1.2vh, 14px) 0 4px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    background: linear-gradient(100deg, var(--menu-gold-light) 0%, #fff 30%, var(--menu-gold) 55%, var(--menu-gold-light) 80%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: var(--menu-gold);
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 4px 22px rgba(224, 184, 76, 0.35));
+}
+
+.menu-subtitle {
+    font-family: 'Anton', 'Arial Narrow', 'Impact', sans-serif;
+    font-weight: 400;
+    font-style: italic;
+    font-size: clamp(18px, 2.6vw, 40px);
+    line-height: 1.3;
+    letter-spacing: 6px;
+    color: var(--menu-green);
+    text-shadow: 0 0 14px rgba(0, 146, 70, 0.45);
+    margin: 0 0 10px;
+    text-transform: uppercase;
+}
+
+.menu-tagline {
+    font-style: italic;
+    font-size: clamp(14px, 1.6vw, 22px);
+    color: #eee;
+    margin: 4px 0;
+}
+
+.menu-quote {
+    font-style: italic;
+    font-size: clamp(12px, 1.2vw, 17px);
+    color: #aaa;
+    margin-top: 10px;
+}
+
+.menu-featured {
+    margin-top: auto;
+    text-align: center;
+}
+
+.menu-featured-label {
+    font-family: 'Anton', 'Arial Narrow', sans-serif;
+    font-weight: 400;
+    font-style: italic;
+    font-size: clamp(15px, 1.7vw, 24px);
+    line-height: 1.3;
+    color: var(--menu-gold);
+    text-shadow: 0 0 8px rgba(224, 184, 76, 0.4);
+    letter-spacing: 1px;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+}
+
+.menu-photo-placeholder {
+    width: 100%;
+    height: clamp(90px, 24vh, 230px);
+    background: linear-gradient(135deg, #1a1a1a, #050505);
+    border: 1px dashed #555;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #666;
+    font-size: clamp(11px, 1vw, 14px);
+    text-align: center;
+    padding: 8px;
+    overflow: hidden;
+}
+
+.menu-photo-placeholder.has-image {
+    border-style: solid;
+    border-color: #333;
+    padding: 0;
+}
+
+.menu-photo-placeholder img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 7px;
+}
+
+.menu-banner {
+    flex-shrink: 0;
+    background: linear-gradient(90deg, var(--menu-red-deep), var(--menu-red) 35%, #ff4d61 50%, var(--menu-red) 65%, var(--menu-red-deep));
+    box-shadow: 0 -6px 26px rgba(210, 31, 60, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(12px, 2vw, 28px);
+    padding: clamp(8px, 1.5vh, 18px) 0;
+}
+
+.menu-banner img {
+    height: clamp(30px, 4.4vh, 56px);
+    filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.5));
+}
+
+.menu-banner-text {
+    font-family: 'Anton', 'Arial Narrow', sans-serif;
+    font-weight: 400;
+    font-style: italic;
+    font-size: clamp(18px, 2.6vw, 36px);
+    line-height: 1.3;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+}
+
+.menu-banner-url {
+    font-family: 'Oswald', Arial, sans-serif;
+    font-weight: 600;
+    font-size: clamp(14px, 1.9vw, 26px);
+}
+
+.menu-loading-msg {
+    color: #777;
+    font-style: italic;
+    font-size: clamp(11px, 1vw, 14px);
+}
+
+/* Staggered entrance animation */
+@keyframes menuReveal {
+    from { opacity: 0; transform: translateY(18px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.menu-col > * {
+    animation: menuReveal 0.7s ease-out both;
+}
+
+.menu-col > *:nth-child(1) { animation-delay: calc(var(--col-delay) + 0.05s); }
+.menu-col > *:nth-child(2) { animation-delay: calc(var(--col-delay) + 0.2s); }
+.menu-col > *:nth-child(3) { animation-delay: calc(var(--col-delay) + 0.35s); }
+.menu-col > *:nth-child(4) { animation-delay: calc(var(--col-delay) + 0.5s); }
+
+.menu-banner {
+    animation: menuReveal 0.7s ease-out both;
+    animation-delay: 0.65s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .italian-flag-strip::after,
+    .menu-col > *,
+    .menu-banner {
+        animation: none !important;
+    }
+}
