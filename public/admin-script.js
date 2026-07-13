@@ -2,32 +2,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     const storageRef = firebase.storage().ref();
     const db = firebase.firestore();
 
-    const uploadImageForm = document.getElementById('uploadImageForm');
     const uploadVideoForm = document.getElementById('uploadVideoForm');
-    const imageSelect = document.getElementById('imageSelect');
     const videoSelect = document.getElementById('videoSelect');
-    const currentImages = document.getElementById('currentImages');
     const currentVideos = document.getElementById('currentVideos');
-    const removeImageButton = document.getElementById('removeImageButton');
     const removeVideoButton = document.getElementById('removeVideoButton');
-
-    // Upload a new menu image
-    uploadImageForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const file = document.getElementById('menuImageFile').files[0];
-        const imageRef = storageRef.child('menuImages/' + file.name);
-        try {
-            const snapshot = await imageRef.put(file);
-            const imageURL = await snapshot.ref.getDownloadURL();
-            await db.collection('menuImages').add({ imageURL, fileName: file.name });
-            alert('Image uploaded successfully');
-            uploadImageForm.reset();
-            populateImageSelect();
-            displayCurrentImages(); // Update display
-        } catch (error) {
-            console.error('Error uploading image:', error);
-        }
-    });
 
     // Upload a new video
     uploadVideoForm.addEventListener('submit', async (e) => {
@@ -47,19 +25,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
-    // Populate image select options and display images
-    async function populateImageSelect() {
-        const snapshot = await db.collection('menuImages').get();
-        imageSelect.innerHTML = '<option value="">Select an Image</option>';
-        snapshot.forEach(doc => {
-            const data = doc.data();
-            const option = document.createElement('option');
-            option.value = doc.id + ',' + data.fileName;
-            option.textContent = data.fileName;
-            imageSelect.appendChild(option);
-        });
-    }
-
     // Populate video select options and display videos
     async function populateVideoSelect() {
         const snapshot = await db.collection('videos').get();
@@ -70,19 +35,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             option.value = doc.id + ',' + data.fileName;
             option.textContent = data.fileName;
             videoSelect.appendChild(option);
-        });
-    }
-
-    // Display current images
-    async function displayCurrentImages() {
-        const snapshot = await db.collection('menuImages').get();
-        currentImages.innerHTML = '';
-        snapshot.forEach(doc => {
-            const data = doc.data();
-            const img = document.createElement('img');
-            img.src = data.imageURL;
-            img.classList.add('menu-item-card');
-            currentImages.appendChild(img);
         });
     }
 
@@ -99,28 +51,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             currentVideos.appendChild(video);
         });
     }
-
-    // Remove selected image
-    removeImageButton.addEventListener('click', async () => {
-        const selectedValue = imageSelect.value;
-        if (!selectedValue) {
-            alert('Please select an image to remove.');
-            return;
-        }
-
-        const [id, fileName] = selectedValue.split(',');
-        const imageRef = storageRef.child('menuImages/' + fileName);
-
-        try {
-            await imageRef.delete();
-            await db.collection('menuImages').doc(id).delete();
-            alert('Image removed successfully');
-            populateImageSelect();
-            displayCurrentImages(); // Update display
-        } catch (error) {
-            console.error('Error removing image:', error);
-        }
-    });
 
     // Remove selected video
     removeVideoButton.addEventListener('click', async () => {
@@ -144,9 +74,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
-    // Initialize the dropdowns and displays on page load
-    populateImageSelect();
+    // Initialize the dropdown and display on page load
     populateVideoSelect();
-    displayCurrentImages();
     displayCurrentVideos();
 });
