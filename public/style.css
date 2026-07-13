@@ -26,6 +26,22 @@ body {
     object-fit: cover; /* Cover the entire container, cropping if necessary */
 }
 
+#menu-frame-container {
+    width: 100%;
+    height: 100vh; /* Full height, same footprint as #video-container */
+    display: none;
+    background-color: black;
+    justify-content: center;
+    align-items: center;
+}
+
+#menu-frame {
+    width: 100%;
+    height: 100%;
+    border: none;
+    display: block;
+}
+
 #home-page {
     flex: 1;
     padding: 0;

@@ -2,6 +2,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     const videoContainer = document.getElementById('video-container');
     const introVideo = document.getElementById('intro-video');
     const homePage = document.getElementById('home-page');
+    const menuFrameContainer = document.getElementById('menu-frame-container');
+    const menuFrame = document.getElementById('menu-frame');
+
+    // The 3 Firestore-backed menu pages take the slot the old uploaded
+    // menu images used to occupy in the rotation: one menu page shown for
+    // menuDisplayDuration, then a video, then the next menu page, etc.
+    const MENU_PAGES = ['menu-gelato.html', 'menu-caffe-caldo.html', 'menu-caffe-freddo.html'];
+    const menuDisplayDuration = 45000; // 45 seconds, same duration images used to show
+    let currentMenuIndex = 0;
 
     let videoSources = [];
     let currentVideoIndex = 0;
@@ -50,7 +59,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (cachedVideos && cachedVideos.length > 0) {
                 videoSources = cachedVideos;
                 console.log(`📋 Loaded from cache - ${videoSources.length} videos`);
-                playNextVideo();
+                showMenuPage();
                 console.log("🔄 Fetching fresh videos in background...");
             } else {
                 console.log("🌐 No cache found, fetching fresh videos from Firestore");
@@ -96,7 +105,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
                 // Start playback if we weren't already playing from cache
                 if (!cachedVideos) {
-                    playNextVideo();
+                    showMenuPage();
                 }
             } else if (!cachedVideos) {
                 console.error("❌ No videos available, retrying in 30 seconds...");
@@ -110,12 +119,29 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (cachedVideos) {
                 console.log("🔄 Falling back to cached videos due to error");
                 videoSources = cachedVideos;
-                playNextVideo();
+                showMenuPage();
             } else {
                 console.log("🔄 Retrying video fetch in 30 seconds...");
                 setTimeout(fetchVideos, 30000);
             }
         }
+    }
+
+    function showMenuPage() {
+        const url = MENU_PAGES[currentMenuIndex];
+        console.log(`🍨 Showing menu page ${currentMenuIndex + 1}/${MENU_PAGES.length}: ${url}`);
+
+        menuFrame.src = url;
+        menuFrameContainer.style.display = 'flex';
+        videoContainer.style.display = 'none';
+        homePage.style.display = 'none';
+
+        currentMenuIndex = (currentMenuIndex + 1) % MENU_PAGES.length;
+
+        setTimeout(() => {
+            menuFrameContainer.style.display = 'none';
+            playNextVideo();
+        }, menuDisplayDuration);
     }
 
     function playNextVideo() {
@@ -155,9 +181,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         homePage.style.display = 'none';
 
         introVideo.onended = () => {
-            console.log("✅ Video ended, moving to next video");
+            console.log("✅ Video ended, moving to next menu page");
             currentVideoIndex = (currentVideoIndex + 1) % videoSources.length;
-            playNextVideo();
+            showMenuPage();
         };
     }
 
