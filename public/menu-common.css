@@ -176,10 +176,17 @@ body.menu-page {
 .menu-title {
     font-family: 'Anton', 'Arial Narrow', 'Impact', sans-serif;
     font-weight: 400;
-    font-style: italic;
+    /* Slant applied via transform, not font-style:italic — synthetic italic
+       skews glyph ink beyond the line box, which Chromium counts toward
+       scrollHeight even with overflow:visible, causing bottom clipping on
+       tall display fonts. A transform never affects scrollHeight/clientHeight,
+       so this gives the same slanted look with no layout/overflow risk. */
+    font-style: normal;
+    transform: skewX(-8deg);
     font-size: clamp(40px, 6.6vw, 112px);
-    line-height: 1.3;
+    line-height: 1.35;
     margin: clamp(6px, 1.2vh, 14px) 0 4px;
+    padding-bottom: 0.12em;
     letter-spacing: 1px;
     text-transform: uppercase;
     background: linear-gradient(100deg, var(--menu-gold-light) 0%, #fff 30%, var(--menu-gold) 55%, var(--menu-gold-light) 80%);
@@ -193,9 +200,11 @@ body.menu-page {
 .menu-subtitle {
     font-family: 'Anton', 'Arial Narrow', 'Impact', sans-serif;
     font-weight: 400;
-    font-style: italic;
+    font-style: normal;
+    transform: skewX(-8deg);
     font-size: clamp(18px, 2.6vw, 40px);
-    line-height: 1.3;
+    line-height: 1.35;
+    padding-bottom: 0.12em;
     letter-spacing: 6px;
     color: var(--menu-green);
     text-shadow: 0 0 14px rgba(0, 146, 70, 0.45);
@@ -309,8 +318,21 @@ body.menu-page {
     to { opacity: 1; transform: translateY(0); }
 }
 
+/* Same slide-in, but keeps the title/subtitle's permanent skewX() slant in
+   the transform the whole time — a plain "transform: translateY()" keyframe
+   would otherwise overwrite (not combine with) the static skew and erase it. */
+@keyframes menuRevealSkewed {
+    from { opacity: 0; transform: skewX(-8deg) translateY(18px); }
+    to { opacity: 1; transform: skewX(-8deg) translateY(0); }
+}
+
 .menu-col > * {
     animation: menuReveal 0.7s ease-out both;
+}
+
+.menu-title,
+.menu-subtitle {
+    animation-name: menuRevealSkewed;
 }
 
 .menu-col > *:nth-child(1) { animation-delay: calc(var(--col-delay) + 0.05s); }
