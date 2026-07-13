@@ -1,132 +1,301 @@
+:root {
+    /* Brand palette — matches the live TV signage pages (menu-common.css):
+       navy -> near-black -> deep wine gradient, Italian red as the one
+       accent color, white for reading text. Kept in sync so the admin
+       tool feels like the same product as the boards it controls. */
+    --navy: #16213e;
+    --black: #0f0f0f;
+    --wine: #1a0505;
+    --red: #ce2b37;
+    --red-bright: #ff5a63;
+    --red-deep: #7a0f1f;
+    --green: #009246;
+    --white: #f5f5f0;
+    --muted: #a9a9b2;
+
+    --surface: rgba(255, 255, 255, 0.045);
+    --surface-2: rgba(255, 255, 255, 0.02);
+    --border: rgba(255, 255, 255, 0.12);
+    --field-bg: #0c0c0f;
+    --field-border: rgba(255, 255, 255, 0.16);
+
+    --shadow-lg: 0 14px 40px rgba(0, 0, 0, 0.5);
+    --shadow-sm: 0 4px 14px rgba(0, 0, 0, 0.35);
+    --radius: 16px;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+@keyframes adminFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation: none !important;
+        transition: none !important;
+    }
+}
+
 body {
-    font-family: Arial, sans-serif;
+    font-family: 'Oswald', Arial, sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #f4f4f4;
+    min-height: 100vh;
+    background: linear-gradient(135deg, var(--navy) 0%, var(--black) 55%, var(--wine) 100%);
+    background-attachment: fixed;
+    color: var(--white);
     display: flex;
     flex-direction: column;
-    min-height: 100vh;
     align-items: center;
 }
 
+/* ---------- Header ---------- */
 header {
-    background: linear-gradient(90deg, green 33.33%, white 33.33%, white 66.66%, red 66.66%);
-    color: #070707;
-    padding: 15px 0;
-    text-align: center;
     width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: linear-gradient(180deg, rgba(15, 15, 15, 0.92), rgba(15, 15, 15, 0.72));
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    box-shadow: var(--shadow-sm);
+}
+
+header::after {
+    content: "";
+    display: block;
+    height: 4px;
+    background: linear-gradient(90deg, var(--green) 0 33.33%, #ffffff 33.33% 66.66%, var(--red) 66.66% 100%);
+    box-shadow: 0 0 12px rgba(255, 255, 255, 0.25);
 }
 
 .logo-container {
     display: flex;
     justify-content: center;
     align-items: center;
+    padding: 14px 0;
 }
 
 .logo {
-    max-width: 150px;
+    max-width: 130px;
     height: auto;
+    filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.55));
 }
 
-main {
-    flex: 1;
-    padding: 20px;
+/* ---------- Toolbar (top-level links, outside <main>) ---------- */
+.admin-toolbar {
     width: 100%;
     display: flex;
-    flex-direction: column;
+    justify-content: center;
+    padding: 18px 16px 0;
+}
+
+/* ---------- Pill link buttons (.btn) ---------- */
+a.btn,
+.btn {
+    display: inline-flex;
     align-items: center;
-}
-
-section {
-    background-color: #fff;
-    padding: 20px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    width: 100%;
-    max-width: 600px;
-    margin: 20px 0;
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    align-items: center;
-}
-
-section h2 {
-    text-align: center;
-    font-size: 1.5em;
-    margin-bottom: 10px;
-    width: 100%;
-}
-
-form {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 100%;
-}
-
-form input[type="file"] {
-    margin: 10px 0;
-    text-align: center;
-}
-
-select {
-    width: 100%;
-}
-
-button {
-    padding: 10px 15px;
-    background-color: #333;
+    justify-content: center;
+    text-decoration: none;
+    background: linear-gradient(135deg, var(--red), var(--red-deep));
     color: #fff;
+    font-weight: 600;
+    letter-spacing: .3px;
+    padding: 11px 26px;
+    border-radius: 999px;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    transition: transform .18s ease, box-shadow .18s ease, filter .18s ease;
+}
+
+a.btn:hover,
+.btn:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.12);
+    box-shadow: 0 8px 22px rgba(206, 43, 55, 0.45);
+}
+
+a.btn:active,
+.btn:active {
+    transform: translateY(0) scale(.98);
+}
+
+/* ---------- Main / sections ---------- */
+main {
+    width: 100%;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 30px 16px 60px;
+    gap: 26px;
+    animation: adminFadeIn .5s ease both;
+}
+
+main > section {
+    width: min(100%, 760px);
+    background: linear-gradient(180deg, var(--surface), var(--surface-2));
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-lg);
+    padding: 26px 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    align-items: stretch;
+}
+
+main > section > h2 {
+    margin: 0;
+    font-family: 'Anton', 'Arial Narrow', 'Impact', sans-serif;
+    font-weight: 400;
+    font-size: 1.35em;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: #ffffff;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.85);
+    padding-bottom: 12px;
+    border-bottom: 3px solid transparent;
+    border-image: linear-gradient(90deg, transparent, var(--red) 15%, var(--red-bright) 50%, var(--red) 85%, transparent) 1;
+}
+
+/* ---------- Forms & bare form controls ---------- */
+main form {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    width: 100%;
+}
+
+main label {
+    font-size: .92em;
+    font-weight: 600;
+    color: #d9d9de;
+    letter-spacing: .2px;
+}
+
+main input[type="text"],
+main input[type="number"],
+main input[type="url"],
+main input[type="email"],
+main input[type="file"],
+main select,
+main textarea {
+    width: 100%;
+    padding: 11px 14px;
+    background: var(--field-bg);
+    color: var(--white);
+    border: 1px solid var(--field-border);
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 1em;
+    outline: none;
+    transition: border-color .2s ease, box-shadow .2s ease;
+}
+
+main textarea {
+    min-height: 100px;
+    resize: vertical;
+}
+
+main input[type="file"] {
+    padding: 9px 10px;
+    cursor: pointer;
+}
+
+main input:hover,
+main select:hover,
+main textarea:hover {
+    border-color: rgba(255, 255, 255, 0.32);
+}
+
+main input:focus,
+main select:focus,
+main textarea:focus {
+    border-color: var(--red);
+    box-shadow: 0 0 0 3px rgba(206, 43, 55, 0.28);
+}
+
+main select {
+    cursor: pointer;
+}
+
+/* ---------- Buttons (generic, non menu-editor-panel) ---------- */
+main button {
+    align-self: center;
     border: none;
-    border-radius: 4px;
-    cursor: pointer;
+    border-radius: 10px;
+    padding: 12px 26px;
+    font-family: inherit;
     font-size: 1em;
+    font-weight: 600;
+    letter-spacing: .3px;
+    color: #fff;
+    cursor: pointer;
+    background: linear-gradient(135deg, var(--red), var(--red-deep));
+    box-shadow: var(--shadow-sm);
+    transition: transform .15s ease, box-shadow .15s ease, filter .15s ease;
 }
 
-button:hover {
-    background-color: #555;
+main button:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.12);
+    box-shadow: 0 8px 22px rgba(206, 43, 55, 0.4);
 }
 
+main button:active {
+    transform: translateY(0);
+}
+
+/* View Main Page — a secondary/ghost action, not a destructive or primary one */
 #viewMainPageButton {
-    background-color: #fff;
-    color: #333;
-    border: 2px solid #333;
-    padding: 10px 20px;
-    font-size: 1em;
-    cursor: pointer;
-    border-radius: 4px;
-    margin-top: 20px;
+    background: transparent;
+    border: 2px solid var(--red);
+    color: #fff;
+    box-shadow: none;
 }
 
 #viewMainPageButton:hover {
-    background-color: #333;
-    color: #fff;
+    background: rgba(206, 43, 55, 0.15);
+    box-shadow: 0 0 16px rgba(206, 43, 55, 0.35);
 }
 
+/* Remove Video — leans into the destructive-red end of the palette */
+#removeVideoButton {
+    background: linear-gradient(135deg, #e0334a, var(--red-deep));
+}
+
+/* ---------- Media grid (Current Videos) ---------- */
 .current-menu-grid {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 20px;
-    margin-top: 20px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 18px;
     width: 100%;
-    max-width: 600px;
 }
 
 .menu-item-card {
     width: 100%;
-    max-width: 300px;
-    height: auto;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    text-align: center;
+    max-width: 100%;
+    border-radius: 12px;
+    background: #000;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-sm);
+    display: block;
 }
 
+/* ---------- Menu Editor hero panel ---------- */
 .menu-editor-panel {
     max-width: 900px;
     align-items: stretch;
@@ -157,6 +326,7 @@ button:hover {
 .menu-editor-panel > p {
     color: #ccc;
     text-align: center;
+    margin: 0;
 }
 
 .menu-editor-toolbar {
@@ -377,16 +547,22 @@ button:hover {
 @media (max-width: 768px) {
     main {
         padding: 12px;
+        gap: 18px;
     }
 
-    section {
-        padding: 16px;
+    main > section {
+        padding: 18px 16px;
         max-width: 100%;
-        margin: 12px 0;
+        margin: 0;
+        border-radius: 12px;
     }
 
-    section h2 {
-        font-size: 1.3em;
+    main > section > h2 {
+        font-size: 1.15em;
+    }
+
+    .menu-editor-panel h2 {
+        font-size: 1.5em;
     }
 
     /* 16px min font-size on all form controls so iOS Safari doesn't
@@ -418,6 +594,10 @@ button:hover {
     .current-menu-grid,
     .menu-item-card {
         max-width: 100%;
+    }
+
+    .current-menu-grid {
+        grid-template-columns: 1fr;
     }
 
     /* Menu Editor toolbar (Reload / Save Changes / Seed Menu Data) and the
@@ -472,7 +652,7 @@ button:hover {
         flex-direction: column;
         align-items: stretch;
         gap: 8px;
-        border-bottom: 1px solid #eee;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.14);
         padding-bottom: 10px;
     }
 

@@ -6,7 +6,7 @@
     <title>Admin Panel</title>
     <link rel="stylesheet" href="admin-style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Anton&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Oswald:wght@400;500;600&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/7.24.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/7.24.0/firebase-firestore.js"></script>
     <script src="https://www.gstatic.com/firebasejs/7.24.0/firebase-storage.js"></script>
@@ -16,28 +16,6 @@
     <script src="menu-seed-data.js"></script>
     <script src="menu-admin.js"></script>
     <link rel="icon" href="dolce-logo.png" type="image/x-icon">
-    <style>
-        .btn {
-        display: inline-block;
-        padding: 10px 20px;
-        font-size: 16px;
-        font-weight: bold;
-        color: #fff;
-        background-color: #007bff; 
-        text-decoration: none;
-        border-radius: 5px; 
-        transition: background-color 0.3s ease; 
-    }
-
-    .btn:hover {
-        background-color: #0056b3; 
-    }
-
-    .btn:active {
-        background-color: #004085; 
-    }
-
-</style>
     <script>
         myAuth.onAuthStateChanged(user => {
             const currentPath = window.location.pathname;
@@ -61,8 +39,9 @@
             <img src="logo.png" alt="Logo" class="logo">
         </div>
     </header>
-    <br></br>
-    <a href="https://dolcevitasinage.web.app/admin.html" class="btn">Gelato Menu</a>
+    <div class="admin-toolbar">
+        <a href="https://dolcevitasinage.web.app/admin.html" class="btn">Gelato Menu</a>
+    </div>
     <main>
         <section class="menu-editor-panel">
             <h2>Menu Editor</h2>
