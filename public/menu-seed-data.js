@@ -139,7 +139,11 @@ const MENU_SEED_DATA = {
                     { name: "Creme Brulee", cash: 8.95, card: 9.30 }
                 ]
             }
-        ]
+        ],
+        featured: {
+            label: "Caffe Freddo",
+            imageUrl: ""
+        }
     }
 };
 

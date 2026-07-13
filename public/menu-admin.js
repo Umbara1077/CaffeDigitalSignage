@@ -102,6 +102,19 @@ document.addEventListener('DOMContentLoaded', () => {
             doc = null;
         }
         currentDoc = doc || structuredCloneFallback(MENU_SEED_DATA[id]);
+
+        // Docs seeded before a `featured` field was added to MENU_SEED_DATA
+        // for this menu won't have it. Merge in the default and save it back
+        // silently so the editor picks it up without discarding any other
+        // admin edits already saved on the document.
+        if (doc && !doc.featured && MENU_SEED_DATA[id] && MENU_SEED_DATA[id].featured) {
+            currentDoc.featured = structuredCloneFallback(MENU_SEED_DATA[id].featured);
+            if (isSignedIn()) {
+                menuDb.collection('menus').doc(id).set({ featured: currentDoc.featured }, { merge: true })
+                    .catch(err => console.error('Error migrating featured field:', err));
+            }
+        }
+
         renderForm();
         clearTimeout(loadWatchdog);
     }

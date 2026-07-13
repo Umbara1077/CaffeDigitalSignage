@@ -22,7 +22,10 @@
     <div class="menu-main">
         <div class="menu-col left">
             <div class="menu-section" id="section-tradizionale"></div>
-            <div class="menu-photo-placeholder">Coffee cup photo</div>
+            <div class="menu-featured">
+                <div class="menu-featured-label" id="featured-label"></div>
+                <div id="featured-photo"></div>
+            </div>
         </div>
 
         <div class="menu-col center">
@@ -52,6 +55,9 @@
             document.getElementById('section-tradizionale').innerHTML = renderSection(sectionById(data, 'tradizionale'));
             document.getElementById('section-gustiFreddoLatte').innerHTML = renderSection(sectionById(data, 'gustiFreddoLatte'));
             document.getElementById('section-caffeDolce').innerHTML = renderSection(sectionById(data, 'caffeDolce'));
+            const featured = data.featured || {};
+            document.getElementById('featured-label').textContent = featured.label || '';
+            document.getElementById('featured-photo').innerHTML = renderPhotoPlaceholder(featured.imageUrl, featured.label, 'Coffee cup photo');
             document.getElementById('banner-text').textContent = data.bannerText || 'MOBILE ORDERING';
             document.getElementById('banner-url').textContent = data.bannerUrl || '';
         }
