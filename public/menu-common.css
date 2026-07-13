@@ -17,12 +17,12 @@
     /* The single master background gradient every page sits on. Everything
        else (columns, sections, tables) stays transparent over this so the
        whole page reads as one field instead of a patchwork of boxes.
-       Deep black -> charcoal -> a barely-there warm wine hint. No green —
-       this is a dark, premium/cinema palette, not an Italian-flag callback
-       (that lives only in the flag strip accent at the top). */
-    --menu-bg-black: #080808;
-    --menu-bg-charcoal: #141414;
-    --menu-bg-wine: #1a0a0a;
+       Dark navy -> near-black -> deep wine, with enough contrast between
+       stops to actually read as a gradient rather than flat black. No
+       green — that lives only in the flag strip accent at the top. */
+    --menu-bg-navy: #16213e;
+    --menu-bg-black: #0f0f0f;
+    --menu-bg-wine: #1a0505;
 }
 
 *, *::before, *::after {
@@ -39,11 +39,11 @@ body.menu-page {
     width: 100vw;
     height: 100vh;
     /* One diagonal gradient is the visual foundation for the whole page —
-       deep black through charcoal into a barely-perceptible warm wine hint
-       at the bottom-right corner. No other element should carry its own
+       dark navy top-left, through near-black, into deep wine at the
+       bottom-right corner. No other element should carry its own
        competing background; they sit transparent on top of this so the
        page reads as one unified, premium-dark field. */
-    background: linear-gradient(135deg, var(--menu-bg-black) 0%, var(--menu-bg-charcoal) 45%, var(--menu-bg-wine) 100%);
+    background: linear-gradient(135deg, var(--menu-bg-navy) 0%, var(--menu-bg-black) 50%, var(--menu-bg-wine) 100%);
     box-shadow: inset 0 0 16vw rgba(0, 0, 0, 0.5);
     color: var(--menu-white);
     font-family: 'Oswald', Arial, sans-serif;
@@ -257,12 +257,10 @@ body.menu-page {
     padding-bottom: 0.12em;
     letter-spacing: 1px;
     text-transform: uppercase;
-    background: linear-gradient(100deg, #ffffff 0%, #f0f0f0 22%, var(--menu-italian-red) 50%, #f0f0f0 78%, #ffffff 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: var(--menu-italian-red);
-    -webkit-text-fill-color: transparent;
-    filter: drop-shadow(0 6px 26px rgba(206, 43, 55, 0.5)) drop-shadow(0 2px 8px rgba(0, 0, 0, 0.7));
+    color: #ffffff;
+    text-shadow:
+        0 4px 12px rgba(0, 0, 0, 0.9),
+        0 2px 4px rgba(0, 0, 0, 0.95);
 }
 
 .menu-subtitle {
