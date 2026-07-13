@@ -36,24 +36,74 @@ document.addEventListener('DOMContentLoaded', () => {
         return !!(typeof myAuth !== 'undefined' && myAuth.currentUser);
     }
 
+    // On mobile, Firebase Auth can take a while to resolve (slower network,
+    // cold IndexedDB persistence lookup). Loading the editor before auth
+    // resolves risks a Firestore read hanging/rejecting with no visible
+    // feedback, leaving the admin staring at "Loading..." forever. So the
+    // very first load is gated on the initial onAuthStateChanged callback
+    // instead of firing unconditionally on DOMContentLoaded.
+    let initialLoadDone = false;
+    let loadWatchdog = null;
+
+    function startLoadWatchdog() {
+        clearTimeout(loadWatchdog);
+        loadWatchdog = setTimeout(() => {
+            if (!formContainer.querySelector('[data-path]')) {
+                formContainer.innerHTML = '<p>Still not loading. Something is stuck.</p>';
+                setStatus('⚠️ Timed out loading the menu editor.', true);
+                const retryBtn = document.createElement('button');
+                retryBtn.type = 'button';
+                retryBtn.textContent = 'Reload';
+                retryBtn.addEventListener('click', () => window.location.reload());
+                formContainer.appendChild(retryBtn);
+            }
+        }, 8000);
+    }
+
     if (typeof myAuth !== 'undefined') {
         myAuth.onAuthStateChanged(user => {
             if (!user) {
-                setStatus('⚠️ Not signed in — menu saves will fail until you log in again.', true);
+                setStatus('⚠️ Not signed in — log in again to load or save menus.', true);
+                clearTimeout(loadWatchdog);
+                if (!initialLoadDone) {
+                    formContainer.innerHTML = '<p>Please log in to edit menus.</p>';
+                }
+                return;
+            }
+            if (!initialLoadDone) {
+                initialLoadDone = true;
+                menuSelect.value = 'gelato';
+                loadMenu('gelato');
             }
         });
+    } else {
+        // No auth wired up at all (shouldn't happen in production) — fall
+        // back to loading immediately rather than hanging forever.
+        initialLoadDone = true;
+        menuSelect.value = 'gelato';
+        loadMenu('gelato');
     }
 
     async function loadMenu(id) {
         formContainer.innerHTML = '<p>Loading...</p>';
-        const snap = await menuDb.collection('menus').doc(id).get();
-        currentDoc = snap.exists ? snap.data() : structuredCloneFallback(MENU_SEED_DATA[id]);
-        if (!snap.exists) {
-            setStatus(`No document found for "${id}" yet — showing seed defaults. Save or use "Seed Menu Data" to write them.`, false);
-        } else {
-            setStatus('');
+        startLoadWatchdog();
+        let doc;
+        try {
+            const snap = await menuDb.collection('menus').doc(id).get();
+            doc = snap.exists ? snap.data() : null;
+            if (!snap.exists) {
+                setStatus(`No document found for "${id}" yet — showing seed defaults. Save or use "Seed Menu Data" to write them.`, false);
+            } else {
+                setStatus('');
+            }
+        } catch (err) {
+            console.error('Error loading menu:', err);
+            setStatus(`⚠️ Could not load "${id}" from Firestore (${err && err.message ? err.message : err}) — showing seed defaults.`, true);
+            doc = null;
         }
+        currentDoc = doc || structuredCloneFallback(MENU_SEED_DATA[id]);
         renderForm();
+        clearTimeout(loadWatchdog);
     }
 
     function structuredCloneFallback(obj) {
@@ -314,8 +364,4 @@ document.addEventListener('DOMContentLoaded', () => {
             setStatus('Error seeding: ' + err.message, true);
         }
     });
-
-    // Auto-select the first menu on load
-    menuSelect.value = 'gelato';
-    loadMenu('gelato');
 });

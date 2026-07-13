@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Panel</title>
     <link rel="stylesheet" href="admin-style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Anton&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/7.24.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/7.24.0/firebase-firestore.js"></script>
     <script src="https://www.gstatic.com/firebasejs/7.24.0/firebase-storage.js"></script>
@@ -62,29 +64,6 @@
     <br></br>
     <a href="https://dolcevitasinage.web.app/admin.html" class="btn">Gelato Menu</a>
     <main>
-        <section>
-            <h2>Upload Video</h2>
-            <form id="uploadVideoForm">
-                <input type="file" id="videoFile" accept="video/mp4" required>
-                <button type="submit">Upload Video</button>
-            </form>
-        </section>
-
-        <section>
-            <h2>Remove Video</h2>
-            <select id="videoSelect">
-                <option value="">Select a Video</option>
-            </select>
-            <button id="removeVideoButton">Remove Video</button>
-        </section>
-
-        <section>
-            <h2>Current Videos</h2>
-            <div class="current-menu-grid" id="currentVideos">
-
-            </div>
-        </section>
-
         <section class="menu-editor-panel">
             <h2>Menu Editor</h2>
             <p>Edit the live Gelato / Caffe Caldo / Caffe Freddo signage menus. Changes save to Firestore and update the TV pages instantly.</p>
@@ -106,6 +85,29 @@
             </div>
 
             <div id="menuEditorForm" class="menu-editor-form"></div>
+        </section>
+
+        <section>
+            <h2>Upload Video</h2>
+            <form id="uploadVideoForm">
+                <input type="file" id="videoFile" accept="video/mp4" required>
+                <button type="submit">Upload Video</button>
+            </form>
+        </section>
+
+        <section>
+            <h2>Remove Video</h2>
+            <select id="videoSelect">
+                <option value="">Select a Video</option>
+            </select>
+            <button id="removeVideoButton">Remove Video</button>
+        </section>
+
+        <section>
+            <h2>Current Videos</h2>
+            <div class="current-menu-grid" id="currentVideos">
+
+            </div>
         </section>
 
         <section>
